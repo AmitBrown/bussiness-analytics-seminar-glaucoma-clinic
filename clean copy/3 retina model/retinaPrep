@@ -1,0 +1,10 @@
+import pandas as pd
+
+tagged = pd.read_csv("tagged_not_glaucoma.csv")
+tagged_retina = tagged[tagged['Patient Category Name'].str.contains('retina', case=False, na=False)]
+print("Number of rows in tagged_retina:", len(tagged_retina))
+
+if "Patient Category Name" in tagged_retina.columns:
+    tagged_retina = tagged_retina.drop(columns=["Patient Category Name"])
+
+tagged_retina.to_csv("tagged_retina.csv", index=False)
