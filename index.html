@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Analyzing Trends in Glaucoma Using a Large Patient Dataset</title>
+  <meta name="description" content="A data-driven analysis of glaucoma progression using OCT and perimetry data." />
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <style>
+    :root{
+      --brand:#18a999;          /* teal */
+      --brand-2:#2a83d3;        /* blue */
+      --ink:#0f172a;            /* slate-900 */
+      --muted:#6b7280;          /* gray-500 */
+      --card:#ffffff;
+      --bg:#f8fbfb;
+      --bg-alt:#eef7f6;
+      --shadow: 0 12px 40px rgba(16, 24, 40, .08);
+      --ring: 0 0 0 6px rgba(24,169,153,.1);
+    }
+    [data-theme="dark"]{
+      --ink:#e5e7eb;
+      --muted:#a3aab8;
+      --card:#101828;
+      --bg:#0b1220;
+      --bg-alt:#0e1829;
+      --shadow: 0 16px 40px rgba(0,0,0,.45);
+      --ring: 0 0 0 6px rgba(42,131,211,.18);
+    }
+
+    html,body{font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; background:var(--bg); color:var(--ink)}
+    img{max-width:100%; height:auto}
+
+    .navbar{--bs-navbar-padding-y:.75rem; backdrop-filter:saturate(180%) blur(8px)}
+    .navbar.bg-surface{background:rgba(255,255,255,.7)}
+    [data-theme="dark"] .navbar.bg-surface{background:rgba(16,24,40,.55)}
+    .navbar-brand{font-weight:800; letter-spacing:.2px}
+    .nav-link{font-weight:600}
+
+    /* Sections & hero */
+    .section{padding:96px 0; position:relative; overflow:hidden}
+    .section.alt{background:var(--bg-alt)}
+    .section-title{font-weight:800; letter-spacing:.2px; margin-bottom:1rem}
+    .section-sub{color:var(--muted); max-width:860px}
+
+    .hero{min-height:100vh; display:flex; align-items:center; text-align:center}
+    .hero .display-1{font-weight:800}
+    .btn-brand{background:linear-gradient(135deg, var(--brand), var(--brand-2)); border:none}
+    .btn-brand:hover{filter:brightness(.95)}
+
+    /* Floating gradient blobs */
+    .blob{
+      position:absolute; filter:blur(60px); opacity:.25; pointer-events:none; z-index:0;
+      background:radial-gradient(40% 40% at 30% 30%, var(--brand) 0, transparent 70%);
+    }
+    .blob.b1{top:-140px; right:-160px; width:520px; height:520px}
+    .blob.b2{bottom:-180px; left:-160px; width:580px; height:580px; background:radial-gradient(40% 40% at 70% 70%, var(--brand-2) 0, transparent 70%);}
+
+    /* Cards */
+    .kcard{
+      background:var(--card); border:1px solid rgba(0,0,0,.06); border-radius:18px; padding:22px;
+      box-shadow:var(--shadow); transition:transform .25s ease, box-shadow .25s ease;
+    }
+    .kcard:hover{transform:translateY(-2px); box-shadow:0 18px 46px rgba(0,0,0,.12)}
+    .kicon{
+      width:42px; height:42px; border-radius:12px; display:inline-flex; align-items:center; justify-content:center;
+      background:linear-gradient(135deg, var(--brand), var(--brand-2)); color:white; font-size:20px;
+      box-shadow: var(--ring);
+    }
+
+    /* Diagram wrapper */
+    .diagram{
+      border-radius:18px; overflow:hidden; box-shadow:var(--shadow); background:#fff;
+      border:1px solid rgba(0,0,0,.06)
+    }
+    [data-theme="dark"] .diagram{background:#0d1526; border-color:rgba(255,255,255,.06)}
+    .caption{color:var(--muted); font-size:.95rem}
+
+    /* Animations */
+    .reveal{opacity:0; transform:translateY(20px); transition:opacity .7s ease, transform .7s ease}
+    .reveal.in{opacity:1; transform:none}
+
+    /* Back to top & theme toggle */
+    #toTop, #themeToggle{
+      position:fixed; right:18px; width:48px; height:48px; border-radius:50%;
+      display:grid; place-items:center; border:1px solid rgba(0,0,0,.08); background:var(--card); color:var(--ink);
+      box-shadow:var(--shadow); z-index:9999;
+    }
+    #toTop{bottom:18px; display:none}
+    #themeToggle{bottom:78px}
+
+    /* Tables (results) */
+    .table thead th{font-weight:700}
+    .table td, .table th{vertical-align:middle}
+
+    /* Links */
+    a{color:var(--brand-2)} a:hover{color:#1667b8}
+  </style>
+</head>
+<body data-bs-spy="scroll" data-bs-target="#topnav" data-bs-smooth-scroll="true">
+
+  <!-- NAVBAR -->
+  <nav id="topnav" class="navbar navbar-expand-lg bg-surface border-bottom sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="#home">Glaucoma Study</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div id="nav" class="collapse navbar-collapse">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="#motivation">Motivation</a></li>
+          <li class="nav-item"><a class="nav-link" href="#objectives">Objectives</a></li>
+          <li class="nav-item"><a class="nav-link" href="#data">Data</a></li>
+          <li class="nav-item"><a class="nav-link" href="#preprocessing">Preprocessing</a></li>
+          <li class="nav-item"><a class="nav-link" href="#modeling">Modeling</a></li>
+          <li class="nav-item"><a class="nav-link" href="#results">Results</a></li>
+          <li class="nav-item"><a class="nav-link" href="#integration">Integration</a></li>
+          <li class="nav-item"><a class="nav-link" href="#discussion">Discussion</a></li>
+          <li class="nav-item"><a class="nav-link" href="#future">Future</a></li>
+          <li class="nav-item"><a class="nav-link" href="#conclusion">Conclusion</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header id="home" class="hero section d-flex align-items-center">
+    <div class="blob b1"></div><div class="blob b2"></div>
+    <div class="container position-relative">
+      <div class="row justify-content-center">
+        <div class="col-xl-9 text-center">
+          <h1 class="display-1 mb-3 reveal">Analyzing Trends in Glaucoma</h1>
+          <p class="lead fs-3 text-secondary reveal">Using a Large Patient Dataset</p>
+          <p class="mb-4 reveal">Tel Aviv University · Coller School of Management<br/>Supervisors: Dr. Moshe Unger &amp; Din Elron · Students: Omri Baum · Amit Bran · Aviel Sodri</p>
+          <a href="#motivation" class="btn btn-brand btn-lg px-5 py-3 reveal">Start Presentation</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MOTIVATION -->
+  <section id="motivation" class="section alt">
+    <div class="blob b1"></div>
+    <div class="container position-relative">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-6 order-lg-2">
+          <div class="diagram p-2 reveal">
+            <img src="assets/data_overview.png" alt="Glaucoma context" />
+          </div>
+          <p class="caption mt-2 reveal">Glaucoma is a leading cause of irreversible blindness; heterogeneous clinical data complicate early detection.</p>
+        </div>
+        <div class="col-lg-6">
+          <h2 class="section-title reveal">Motivation</h2>
+          <p class="section-sub reveal">Create a reliable, privacy-safe foundation for progression modeling from real hospital datasets (Sheba Medical Center).</p>
+          <div class="row g-3 mt-2">
+            <div class="col-sm-6 reveal">
+              <div class="kcard h-100">
+                <div class="kicon mb-2"><i class="bi bi-eye"></i></div>
+                <h6 class="mb-1">Clinical Challenge</h6>
+                <p class="mb-0 text-secondary">Data are heterogeneous, partially labeled, and collected over long follow-ups.</p>
+              </div>
+            </div>
+            <div class="col-sm-6 reveal">
+              <div class="kcard h-100">
+                <div class="kicon mb-2"><i class="bi bi-shield-check"></i></div>
+                <h6 class="mb-1">Goal</h6>
+                <p class="mb-0 text-secondary">High-precision filtering to avoid false removals and keep glaucoma-related data.</p>
+              </div>
+            </div>
+            <div class="col-sm-6 reveal">
+              <div class="kcard h-100">
+                <div class="kicon mb-2"><i class="bi bi-people-fill"></i></div>
+                <h6 class="mb-1">Collaboration</h6>
+                <p class="mb-0 text-secondary">Work done with ophthalmologists at Sheba Medical Center.</p>
+              </div>
+            </div>
+            <div class="col-sm-6 reveal">
+              <div class="kcard h-100">
+                <div class="kicon mb-2"><i class="bi bi-bar-chart-line"></i></div>
+                <h6 class="mb-1">Outcome</h6>
+                <p class="mb-0 text-secondary">A clean, integrated dataset ready for progression modeling.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </section>
+
+  <!-- OBJECTIVES -->
+  <section id="objectives" class="section">
+    <div class="blob b2"></div>
+    <div class="container position-relative">
+      <div class="row g-4 align-items-center">
+        <div class="col-lg-5">
+          <h2 class="section-title reveal">Research Objectives</h2>
+          <p class="section-sub reveal">Three concrete goals guiding the analytical design.</p>
+          <div class="vstack gap-3 mt-2">
+            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-funnel-fill"></i></div> Filter non-glaucoma OCT with <strong>≥95% precision</strong> via PNU learning.</div>
+            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-layers"></i></div> Integrate <strong>OCT (MacularCube/OptiDisc)</strong> with <strong>Perimetry</strong>.</div>
+            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-gear-wide-connected"></i></div> Build a <strong>reproducible</strong>, scalable pipeline.</div>
+          </div>
+        </div>
+        <div class="col-lg-7">
+          <div class="diagram p-2 reveal">
+            <img src="assets/mission_banner.png" alt="Objectives Illustration">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DATA -->
+  <section id="data" class="section alt">
+    <div class="container">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-6">
+          <div class="diagram p-2 reveal">
+            <img src="assets/data_stack.png" alt="Datasets" />
+          </div>
+          <p class="caption mt-2 reveal">MacularCube (~160K), OptiDisc (~110K), Perimetry (~14K) — structural + functional view.</p>
+        </div>
+        <div class="col-lg-6">
+          <h2 class="section-title reveal">Datasets Overview</h2>
+          <div class="row g-3">
+            <div class="col-sm-6 reveal">
+              <div class="kcard h-100">
+                <div class="kicon mb-2"><i class="bi bi-grid-3x3-gap"></i></div>
+                <h6 class="mb-1">MacularCube</h6>
+                <p class="mb-0 text-secondary">GCL+IPL thickness, foveal coordinates, scan quality.</p>
+              </div>
+            </div>
+            <div class="col-sm-6 reveal">
+              <div class="kcard h-100">
+                <div class="kicon mb-2"><i class="bi bi-record-circle"></i></div>
+                <h6 class="mb-1">OptiDisc</h6>
+                <p class="mb-0 text-secondary">RNFL thickness, Garway-Heath zones, cup-to-disc ratio.</p>
+              </div>
+            </div>
+            <div class="col-sm-6 reveal">
+              <div class="kcard h-100">
+                <div class="kicon mb-2"><i class="bi bi-bullseye"></i></div>
+                <h6 class="mb-1">Perimetry</h6>
+                <p class="mb-0 text-secondary">VFI, MD, PSD + location-wise sensitivities; reliability filters applied.</p>
+              </div>
+            </div>
+            <div class="col-sm-6 reveal">
+              <div class="kcard h-100">
+                <div class="kicon mb-2"><i class="bi bi-shuffle"></i></div>
+                <h6 class="mb-1">Unified Schema</h6>
+                <p class="mb-0 text-secondary">Patient ID, Eye, Gender, Scan Date, summary metrics — ready to join.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </section>
+
+  <!-- PREPROCESSING -->
+  <section id="preprocessing" class="section">
+    <div class="container">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-6 order-lg-2">
+          <div class="diagram p-2 reveal">
+            <img src="assets/preprocessing_flow.png" alt="Preprocessing Flow">
+          </div>
+          <p class="caption mt-2 reveal">Standardization, leakage-safe imputation, one-hot with MISSING, and reliability checks.</p>
+        </div>
+        <div class="col-lg-6">
+          <h2 class="section-title reveal">Preprocessing</h2>
+          <div class="vstack gap-3">
+            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-sliders2-vertical"></i></div> Drop constant/ultra-sparse columns; standardize demographics.</div>
+            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-calendar3"></i></div> Derive <em>age_at_scan</em>, <em>scan_year</em>, <em>scan_month</em>.</div>
+            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-heart-pulse"></i></div> Perimetry quality: FP ≤15%, FN ≤25%, CENTRAL_24_2_THRESHOLD_TEST.</div>
+            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-braces-asterisk"></i></div> Median imputation in-fold; one-hot with <em>MISSING</em> category.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODELING -->
+  <section id="modeling" class="section alt">
+    <div class="container">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-6">
+          <div class="diagram p-2 reveal">
+            <img src="assets/pnu_pipeline.png" alt="PNU Pipeline Diagram">
+          </div>
+          <p class="caption mt-2 reveal">PNU classifiers per non-glaucoma clinic category; threshold tuned for precision.</p>
+        </div>
+        <div class="col-lg-6">
+          <h2 class="section-title reveal">Modeling Framework</h2>
+          <div class="row g-3">
+            <div class="col-sm-6 reveal">
+              <div class="kcard h-100">
+                <div class="kicon mb-2"><i class="bi bi-diagram-3"></i></div>
+                <h6 class="mb-1">PNU Learning</h6>
+                <p class="mb-0 text-secondary">Positive–Negative–Unlabeled for partially labeled data.</p>
+              </div>
+            </div>
+            <div class="col-sm-6 reveal">
+              <div class="kcard h-100">
+                <div class="kicon mb-2"><i class="bi bi-cpu"></i></div>
+                <h6 class="mb-1">Models</h6>
+                <p class="mb-0 text-secondary">Logistic Regression baseline; <strong>XGBoost</strong> for production.</p>
+              </div>
+            </div>
+            <div class="col-sm-6 reveal">
+              <div class="kcard h-100">
+                <div class="kicon mb-2"><i class="bi bi-bullseye"></i></div>
+                <h6 class="mb-1">Design</h6>
+                <p class="mb-0 text-secondary">Precision-first (≥0.95), τ≈0.97; PR-AUC + Recall@τ for monitoring.</p>
+              </div>
+            </div>
+            <div class="col-sm-6 reveal">
+              <div class="kcard h-100">
+                <div class="kicon mb-2"><i class="bi bi-people"></i></div>
+                <h6 class="mb-1">Validation</h6>
+                <p class="mb-0 text-secondary">GroupShuffleSplit by patient ID to avoid leakage.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="results" class="section">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <h2 class="section-title reveal">Model Results</h2>
+          <p class="section-sub reveal">High precision across categories; recall varies by design to avoid false removals.</p>
+          <div class="table-responsive reveal">
+            <table class="table table-bordered align-middle">
+              <thead class="table-light">
+                <tr><th>Category</th><th>PR-AUC</th><th>Precision@τ</th><th>Recall@τ</th><th>Flag Rate</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>NEURO</td><td>0.887</td><td>0.95</td><td>0.15</td><td>2.9%</td></tr>
+                <tr><td>CME</td><td>0.955</td><td>0.96</td><td>0.97</td><td>0.02%</td></tr>
+                <tr><td>RETINA–VO</td><td>~0.96</td><td>0.95</td><td>&gt;0.98</td><td>&lt;0.1%</td></tr>
+                <tr class="table-secondary"><td><strong>Overall</strong></td><td>—</td><td><strong>≥0.95</strong></td><td>—</td><td><strong>&lt;3%</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="diagram p-2 reveal">
+            <img src="assets/results_chart.png" alt="Precision-Recall summary">
+          </div>
+          <p class="caption mt-2 reveal">PR-AUC and precision targets achieved; conservative recall by clinical choice.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTEGRATION -->
+  <section id="integration" class="section alt">
+    <div class="container">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-6 order-lg-2">
+          <div class="diagram p-2 reveal">
+            <img src="assets/integration_flow.png" alt="Integration Flow Diagram">
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <h2 class="section-title reveal">Integration Results</h2>
+          <div class="row g-3">
+            <div class="col-sm-12 reveal">
+              <div class="kcard">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="kicon"><i class="bi bi-archive"></i></div>
+                  <div>
+                    <strong>After filtering:</strong> 53,022 glaucoma OCT scans retained.<br>
+                    <strong>+ OptiDisc:</strong> 45,836 structural records.<br>
+                    <strong>+ Perimetry:</strong> 17,132 multimodal patient-eye records.
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-12 reveal">
+              <div class="kcard">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="kicon"><i class="bi bi-diagram-3-fill"></i></div>
+                  <div>
+                    Unified schema enables longitudinal analysis and future progression modeling.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="caption mt-2 reveal">~37% of structural dataset preserved as complete tri-modal cases (high confidence).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DISCUSSION -->
+  <section id="discussion" class="section">
+    <div class="container">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-6">
+          <h2 class="section-title reveal">Discussion & Trade-offs</h2>
+          <div class="vstack gap-3">
+            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-shield"></i></div> Precision-first design reduces recall to avoid discarding valid glaucoma scans.</div>
+            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-diagram-2"></i></div> Labels from clinic categories may overlap; thresholds are adjustable with clinicians.</div>
+            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-image"></i></div> Summary metrics used (not raw OCT volumes) — conservative but interpretable.</div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="diagram p-2 reveal">
+            <img src="assets/discussion_visual.png" alt="Discussion Visual">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FUTURE -->
+  <section id="future" class="section alt">
+    <div class="container">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-6 order-lg-2">
+          <div class="diagram p-2 reveal">
+            <img src="assets/future_roadmap.png" alt="Future Roadmap">
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <h2 class="section-title reveal">Future Directions</h2>
+          <div class="row g-3">
+            <div class="col-sm-6 reveal"><div class="kcard h-100"><div class="kicon mb-2"><i class="bi bi-gpu-card"></i></div><strong>Raw OCT DL</strong><br/>CNN/3D/ViT on volumes to boost sensitivity.</div></div>
+            <div class="col-sm-6 reveal"><div class="kcard h-100"><div class="kicon mb-2"><i class="bi bi-clock-history"></i></div><strong>Temporal Models</strong><br/>RNN/Transformers for progression trajectories.</div></div>
+            <div class="col-sm-6 reveal"><div class="kcard h-100"><div class="kicon mb-2"><i class="bi bi-hospital"></i></div><strong>Multi-Site Data</strong><br/>Generalize across devices and populations.</div></div>
+            <div class="col-sm-6 reveal"><div class="kcard h-100"><div class="kicon mb-2"><i class="bi bi-sliders"></i></div><strong>Clinical Tuning</strong><br/>Dynamic τ to balance inclusiveness & caution.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONCLUSION -->
+  <section id="conclusion" class="section">
+    <div class="blob b1"></div>
+    <div class="container">
+      <div class="row justify-content-center text-center">
+        <div class="col-xl-8">
+          <h2 class="section-title reveal">Conclusion</h2>
+          <p class="lead section-sub reveal">We built a robust, reproducible pipeline that filters and integrates ophthalmic data with ≥95% precision, producing 17K high-quality multimodal records for progression modeling.</p>
+          <p class="reveal">GitHub: <a href="https://github.com/AmitBrown/bussiness-analytics-seminar-glaucoma-clinic" target="_blank" rel="noopener">Project Repository</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="py-5 border-top">
+    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center">
+      <div class="fw-semibold">Analyzing Trends in Glaucoma</div>
+      <small class="text-secondary mt-3 mt-md-0">© <span id="year"></span> Tel Aviv University · Coller School of Management</small>
+    </div>
+  </footer>
+
+  <!-- Back to top & Theme toggle -->
+  <button id="themeToggle" class="btn" title="Toggle theme" aria-label="Toggle theme"><i class="bi bi-moon-stars"></i></button>
+  <button id="toTop" class="btn" title="Back to top" aria-label="Back to top"><i class="bi bi-arrow-up"></i></button>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Scroll reveal
+    const revealEls = [...document.querySelectorAll('.reveal')];
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, {threshold:.16});
+    revealEls.forEach(el=>io.observe(el));
+
+    // Back to top
+    const toTop = document.getElementById('toTop');
+    window.addEventListener('scroll',()=>{ toTop.style.display = window.scrollY>600 ? 'grid':'none'; });
+    toTop.addEventListener('click',()=> window.scrollTo({top:0, behavior:'smooth'}));
+
+    // Theme toggle (light/dark) — persisted
+    const root = document.documentElement;
+    const themeToggle = document.getElementById('themeToggle');
+    const THEME_KEY = 'glauc_theme';
+    const setTheme = (t)=>{ root.setAttribute('data-theme', t); themeToggle.innerHTML = t==='dark' ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon-stars"></i>'; localStorage.setItem(THEME_KEY, t); };
+    const saved = localStorage.getItem(THEME_KEY) || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light');
+    setTheme(saved);
+    themeToggle.addEventListener('click', ()=> setTheme(root.getAttribute('data-theme')==='dark' ? 'light':'dark'));
+  </script>
+</body>
+</html>
