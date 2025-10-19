@@ -73,7 +73,7 @@
       box-shadow: var(--ring);
     }
 
-    /* Diagram wrapper */
+    /* Diagram wrapper (left for future use) */
     .diagram{
       border-radius:18px; overflow:hidden; box-shadow:var(--shadow); background:#fff;
       border:1px solid rgba(0,0,0,.06)
@@ -147,43 +147,37 @@
   <section id="motivation" class="section alt">
     <div class="blob b1"></div>
     <div class="container position-relative">
-      <div class="row align-items-center g-4">
-        <div class="col-lg-6 order-lg-2">
-          <div class="diagram p-2 reveal">
-            <img src="assets/data_overview.png" alt="Glaucoma context" />
-          </div>
-          <p class="caption mt-2 reveal">Glaucoma is a leading cause of irreversible blindness; heterogeneous clinical data complicate early detection.</p>
-        </div>
-        <div class="col-lg-6">
+      <div class="row justify-content-center">
+        <div class="col-xl-9">
           <h2 class="section-title reveal">Motivation</h2>
-          <p class="section-sub reveal">Create a reliable, privacy-safe foundation for progression modeling from real hospital datasets (Sheba Medical Center).</p>
+          <p class="section-sub reveal">Glaucoma is a leading cause of irreversible blindness; data are heterogeneous and partially labeled, complicating early detection.</p>
           <div class="row g-3 mt-2">
-            <div class="col-sm-6 reveal">
+            <div class="col-md-6 reveal">
               <div class="kcard h-100">
                 <div class="kicon mb-2"><i class="bi bi-eye"></i></div>
                 <h6 class="mb-1">Clinical Challenge</h6>
-                <p class="mb-0 text-secondary">Data are heterogeneous, partially labeled, and collected over long follow-ups.</p>
+                <p class="mb-0 text-secondary">Longitudinal, noisy, multi-device records across clinics.</p>
               </div>
             </div>
-            <div class="col-sm-6 reveal">
+            <div class="col-md-6 reveal">
               <div class="kcard h-100">
                 <div class="kicon mb-2"><i class="bi bi-shield-check"></i></div>
                 <h6 class="mb-1">Goal</h6>
-                <p class="mb-0 text-secondary">High-precision filtering to avoid false removals and keep glaucoma-related data.</p>
+                <p class="mb-0 text-secondary">Privacy-safe, high-precision filtering for downstream modeling.</p>
               </div>
             </div>
-            <div class="col-sm-6 reveal">
+            <div class="col-md-6 reveal">
               <div class="kcard h-100">
                 <div class="kicon mb-2"><i class="bi bi-people-fill"></i></div>
                 <h6 class="mb-1">Collaboration</h6>
-                <p class="mb-0 text-secondary">Work done with ophthalmologists at Sheba Medical Center.</p>
+                <p class="mb-0 text-secondary">In partnership with Sheba Medical Center.</p>
               </div>
             </div>
-            <div class="col-sm-6 reveal">
+            <div class="col-md-6 reveal">
               <div class="kcard h-100">
                 <div class="kicon mb-2"><i class="bi bi-bar-chart-line"></i></div>
                 <h6 class="mb-1">Outcome</h6>
-                <p class="mb-0 text-secondary">A clean, integrated dataset ready for progression modeling.</p>
+                <p class="mb-0 text-secondary">Clean, integrated dataset for progression analysis.</p>
               </div>
             </div>
           </div>
@@ -196,19 +190,14 @@
   <section id="objectives" class="section">
     <div class="blob b2"></div>
     <div class="container position-relative">
-      <div class="row g-4 align-items-center">
-        <div class="col-lg-5">
+      <div class="row justify-content-center">
+        <div class="col-xl-8">
           <h2 class="section-title reveal">Research Objectives</h2>
           <p class="section-sub reveal">Three concrete goals guiding the analytical design.</p>
           <div class="vstack gap-3 mt-2">
-            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-funnel-fill"></i></div> Filter non-glaucoma OCT with <strong>≥95% precision</strong> via PNU learning.</div>
-            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-layers"></i></div> Integrate <strong>OCT (MacularCube/OptiDisc)</strong> with <strong>Perimetry</strong>.</div>
-            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-gear-wide-connected"></i></div> Build a <strong>reproducible</strong>, scalable pipeline.</div>
-          </div>
-        </div>
-        <div class="col-lg-7">
-          <div class="diagram p-2 reveal">
-            <img src="assets/mission_banner.png" alt="Objectives Illustration">
+            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-funnel-fill"></i></div> Filter non-glaucoma OCT with <strong>≥95% precision</strong> via Positive–Negative–Unlabeled (PNU) learning.</div>
+            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-layers"></i></div> Integrate <strong>OCT (MacularCube/OptiDisc)</strong> with <strong>Perimetry</strong> into a unified longitudinal dataset.</div>
+            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-gear-wide-connected"></i></div> Build a <strong>reproducible</strong>, scalable processing and validation pipeline.</div>
           </div>
         </div>
       </div>
@@ -220,10 +209,10 @@
     <div class="container">
       <div class="row align-items-center g-4">
         <div class="col-lg-6">
-          <div class="diagram p-2 reveal">
-            <img src="assets/data_stack.png" alt="Datasets" />
+          <div class="diagram p-3 reveal">
+            <div class="text-center text-secondary">MacularCube (~160K) • OptiDisc (~110K) • Perimetry (~14K)</div>
           </div>
-          <p class="caption mt-2 reveal">MacularCube (~160K), OptiDisc (~110K), Perimetry (~14K) — structural + functional view.</p>
+          <p class="caption mt-2 reveal">Structural + functional modalities with standardized summaries.</p>
         </div>
         <div class="col-lg-6">
           <h2 class="section-title reveal">Datasets Overview</h2>
@@ -246,14 +235,14 @@
               <div class="kcard h-100">
                 <div class="kicon mb-2"><i class="bi bi-bullseye"></i></div>
                 <h6 class="mb-1">Perimetry</h6>
-                <p class="mb-0 text-secondary">VFI, MD, PSD + location-wise sensitivities; reliability filters applied.</p>
+                <p class="mb-0 text-secondary">VFI, MD, PSD; pointwise sensitivity with reliability checks.</p>
               </div>
             </div>
             <div class="col-sm-6 reveal">
               <div class="kcard h-100">
                 <div class="kicon mb-2"><i class="bi bi-shuffle"></i></div>
                 <h6 class="mb-1">Unified Schema</h6>
-                <p class="mb-0 text-secondary">Patient ID, Eye, Gender, Scan Date, summary metrics — ready to join.</p>
+                <p class="mb-0 text-secondary">Patient/Eye keys with standardized dates & summaries.</p>
               </div>
             </div>
           </div>
@@ -265,20 +254,15 @@
   <!-- PREPROCESSING -->
   <section id="preprocessing" class="section">
     <div class="container">
-      <div class="row align-items-center g-4">
-        <div class="col-lg-6 order-lg-2">
-          <div class="diagram p-2 reveal">
-            <img src="assets/preprocessing_flow.png" alt="Preprocessing Flow">
-          </div>
-          <p class="caption mt-2 reveal">Standardization, leakage-safe imputation, one-hot with MISSING, and reliability checks.</p>
-        </div>
-        <div class="col-lg-6">
+      <div class="row justify-content-center">
+        <div class="col-xl-9">
           <h2 class="section-title reveal">Preprocessing</h2>
+          <p class="section-sub reveal">Standardization and leakage-safe feature engineering to create consistent inputs.</p>
           <div class="vstack gap-3">
-            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-sliders2-vertical"></i></div> Drop constant/ultra-sparse columns; standardize demographics.</div>
+            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-sliders2-vertical"></i></div> Remove constant/ultra-sparse columns; standardize demographics.</div>
             <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-calendar3"></i></div> Derive <em>age_at_scan</em>, <em>scan_year</em>, <em>scan_month</em>.</div>
-            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-heart-pulse"></i></div> Perimetry quality: FP ≤15%, FN ≤25%, CENTRAL_24_2_THRESHOLD_TEST.</div>
-            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-braces-asterisk"></i></div> Median imputation in-fold; one-hot with <em>MISSING</em> category.</div>
+            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-heart-pulse"></i></div> Perimetry quality filters: FP ≤15%, FN ≤25%, standardized test type.</div>
+            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-braces-asterisk"></i></div> Median imputation within folds; one-hot encoding with explicit <em>MISSING</em> class.</div>
           </div>
         </div>
       </div>
@@ -288,38 +272,33 @@
   <!-- MODELING -->
   <section id="modeling" class="section alt">
     <div class="container">
-      <div class="row align-items-center g-4">
-        <div class="col-lg-6">
-          <div class="diagram p-2 reveal">
-            <img src="assets/pnu_pipeline.png" alt="PNU Pipeline Diagram">
-          </div>
-          <p class="caption mt-2 reveal">PNU classifiers per non-glaucoma clinic category; threshold tuned for precision.</p>
-        </div>
-        <div class="col-lg-6">
+      <div class="row justify-content-center">
+        <div class="col-xl-9">
           <h2 class="section-title reveal">Modeling Framework</h2>
+          <p class="section-sub reveal">PNU learning conservatively removes non-glaucoma cases while preserving true positives.</p>
           <div class="row g-3">
-            <div class="col-sm-6 reveal">
+            <div class="col-md-6 reveal">
               <div class="kcard h-100">
                 <div class="kicon mb-2"><i class="bi bi-diagram-3"></i></div>
                 <h6 class="mb-1">PNU Learning</h6>
-                <p class="mb-0 text-secondary">Positive–Negative–Unlabeled for partially labeled data.</p>
+                <p class="mb-0 text-secondary">Positive–Negative–Unlabeled design for partially-labeled clinical data.</p>
               </div>
             </div>
-            <div class="col-sm-6 reveal">
+            <div class="col-md-6 reveal">
               <div class="kcard h-100">
                 <div class="kicon mb-2"><i class="bi bi-cpu"></i></div>
-                <h6 class="mb-1">Models</h6>
-                <p class="mb-0 text-secondary">Logistic Regression baseline; <strong>XGBoost</strong> for production.</p>
+                <h6 class="mb-1">Model Family</h6>
+                <p class="mb-0 text-secondary">Logistic Regression (interpretable) and <strong>XGBoost</strong> (nonlinear performance).</p>
               </div>
             </div>
-            <div class="col-sm-6 reveal">
+            <div class="col-md-6 reveal">
               <div class="kcard h-100">
                 <div class="kicon mb-2"><i class="bi bi-bullseye"></i></div>
-                <h6 class="mb-1">Design</h6>
-                <p class="mb-0 text-secondary">Precision-first (≥0.95), τ≈0.97; PR-AUC + Recall@τ for monitoring.</p>
+                <h6 class="mb-1">Design Targets</h6>
+                <p class="mb-0 text-secondary">Precision-first (≥0.95), τ≈0.97; monitor PR-AUC, Precision@τ, Recall@τ.</p>
               </div>
             </div>
-            <div class="col-sm-6 reveal">
+            <div class="col-md-6 reveal">
               <div class="kcard h-100">
                 <div class="kicon mb-2"><i class="bi bi-people"></i></div>
                 <h6 class="mb-1">Validation</h6>
@@ -335,10 +314,10 @@
   <!-- RESULTS -->
   <section id="results" class="section">
     <div class="container">
-      <div class="row g-4">
-        <div class="col-lg-6">
+      <div class="row justify-content-center">
+        <div class="col-xl-10">
           <h2 class="section-title reveal">Model Results</h2>
-          <p class="section-sub reveal">High precision across categories; recall varies by design to avoid false removals.</p>
+          <p class="section-sub reveal">High precision across categories; recall varies by design to minimize false removals.</p>
           <div class="table-responsive reveal">
             <table class="table table-bordered align-middle">
               <thead class="table-light">
@@ -353,12 +332,6 @@
             </table>
           </div>
         </div>
-        <div class="col-lg-6">
-          <div class="diagram p-2 reveal">
-            <img src="assets/results_chart.png" alt="Precision-Recall summary">
-          </div>
-          <p class="caption mt-2 reveal">PR-AUC and precision targets achieved; conservative recall by clinical choice.</p>
-        </div>
       </div>
     </div>
   </section>
@@ -366,16 +339,11 @@
   <!-- INTEGRATION -->
   <section id="integration" class="section alt">
     <div class="container">
-      <div class="row align-items-center g-4">
-        <div class="col-lg-6 order-lg-2">
-          <div class="diagram p-2 reveal">
-            <img src="assets/integration_flow.png" alt="Integration Flow Diagram">
-          </div>
-        </div>
-        <div class="col-lg-6">
+      <div class="row justify-content-center">
+        <div class="col-xl-9">
           <h2 class="section-title reveal">Integration Results</h2>
           <div class="row g-3">
-            <div class="col-sm-12 reveal">
+            <div class="col-12 reveal">
               <div class="kcard">
                 <div class="d-flex align-items-center gap-3">
                   <div class="kicon"><i class="bi bi-archive"></i></div>
@@ -387,7 +355,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-sm-12 reveal">
+            <div class="col-12 reveal">
               <div class="kcard">
                 <div class="d-flex align-items-center gap-3">
                   <div class="kicon"><i class="bi bi-diagram-3-fill"></i></div>
@@ -398,7 +366,7 @@
               </div>
             </div>
           </div>
-          <p class="caption mt-2 reveal">~37% of structural dataset preserved as complete tri-modal cases (high confidence).</p>
+          <p class="section-sub mt-3 reveal">Approx. 37% of the structural dataset preserved as complete tri-modal cases (high confidence).</p>
         </div>
       </div>
     </div>
@@ -407,18 +375,13 @@
   <!-- DISCUSSION -->
   <section id="discussion" class="section">
     <div class="container">
-      <div class="row align-items-center g-4">
-        <div class="col-lg-6">
+      <div class="row justify-content-center">
+        <div class="col-xl-9">
           <h2 class="section-title reveal">Discussion & Trade-offs</h2>
           <div class="vstack gap-3">
             <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-shield"></i></div> Precision-first design reduces recall to avoid discarding valid glaucoma scans.</div>
-            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-diagram-2"></i></div> Labels from clinic categories may overlap; thresholds are adjustable with clinicians.</div>
-            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-image"></i></div> Summary metrics used (not raw OCT volumes) — conservative but interpretable.</div>
-          </div>
-        </div>
-        <div class="col-lg-6">
-          <div class="diagram p-2 reveal">
-            <img src="assets/discussion_visual.png" alt="Discussion Visual">
+            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-diagram-2"></i></div> Clinic labels may overlap; thresholds adjustable with clinician input.</div>
+            <div class="kcard reveal"><div class="kicon me-2"><i class="bi bi-image"></i></div> Summary metrics (not raw OCT volumes) increase interpretability but may limit sensitivity.</div>
           </div>
         </div>
       </div>
@@ -428,19 +391,14 @@
   <!-- FUTURE -->
   <section id="future" class="section alt">
     <div class="container">
-      <div class="row align-items-center g-4">
-        <div class="col-lg-6 order-lg-2">
-          <div class="diagram p-2 reveal">
-            <img src="assets/future_roadmap.png" alt="Future Roadmap">
-          </div>
-        </div>
-        <div class="col-lg-6">
+      <div class="row justify-content-center">
+        <div class="col-xl-9">
           <h2 class="section-title reveal">Future Directions</h2>
           <div class="row g-3">
-            <div class="col-sm-6 reveal"><div class="kcard h-100"><div class="kicon mb-2"><i class="bi bi-gpu-card"></i></div><strong>Raw OCT DL</strong><br/>CNN/3D/ViT on volumes to boost sensitivity.</div></div>
-            <div class="col-sm-6 reveal"><div class="kcard h-100"><div class="kicon mb-2"><i class="bi bi-clock-history"></i></div><strong>Temporal Models</strong><br/>RNN/Transformers for progression trajectories.</div></div>
-            <div class="col-sm-6 reveal"><div class="kcard h-100"><div class="kicon mb-2"><i class="bi bi-hospital"></i></div><strong>Multi-Site Data</strong><br/>Generalize across devices and populations.</div></div>
-            <div class="col-sm-6 reveal"><div class="kcard h-100"><div class="kicon mb-2"><i class="bi bi-sliders"></i></div><strong>Clinical Tuning</strong><br/>Dynamic τ to balance inclusiveness & caution.</div></div>
+            <div class="col-md-6 reveal"><div class="kcard h-100"><div class="kicon mb-2"><i class="bi bi-gpu-card"></i></div><strong>Raw OCT Deep Learning</strong><br/>CNN/3D/ViT on volumes to boost sensitivity.</div></div>
+            <div class="col-md-6 reveal"><div class="kcard h-100"><div class="kicon mb-2"><i class="bi bi-clock-history"></i></div><strong>Temporal Models</strong><br/>RNN/Transformers for progression trajectories.</div></div>
+            <div class="col-md-6 reveal"><div class="kcard h-100"><i class="kicon mb-2 bi bi-hospital"></i><strong>Multi-Site Data</strong><br/>Generalize across devices and populations.</div></div>
+            <div class="col-md-6 reveal"><div class="kcard h-100"><div class="kicon mb-2"><i class="bi bi-sliders"></i></div><strong>Clinical Tuning</strong><br/>Dynamic τ to balance inclusiveness & caution.</div></div>
           </div>
         </div>
       </div>
